@@ -19,7 +19,9 @@ class Settings(BaseSettings):
     app_env: str = "local"
     log_level: str = "INFO"
     database_url: str
-    openai_api_key: str | None = None
+    anthropic_api_key: str | None = None
+    anthropic_model: str = "claude-haiku-5-5"
+    deepseek_api_key: str | None = None
 
 
 @lru_cache
