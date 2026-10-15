@@ -40,7 +40,10 @@ async def main() -> None:
         text = "".join(b.get("text", "") for b in data["content"] if b["type"] == "text")
         usage = data["usage"]
         print(f"\n--- 提取出的回答 ---\n{text}")
-        print(f"\n--- 用量 ---\n输入 {usage['input_tokens']} token，输出 {usage['output_tokens']} token")
+        print(
+            f"\n--- 用量 ---\n输入 {usage['input_tokens']} token，"
+            f"输出 {usage['output_tokens']} token"
+        )
 
 
 if __name__ == "__main__":

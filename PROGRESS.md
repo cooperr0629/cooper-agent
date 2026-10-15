@@ -39,7 +39,7 @@
 - [x] `AnthropicClient.chat()`：`app/llm/anthropic.py`，真实调用通过
 - [x] 模型可配置：`.env` 的 `ANTHROPIC_MODEL`，默认 `claude-haiku-5-5`（比 Opus 便宜 40 倍）
 - [ ] `AnthropicClient.stream()`：SSE 流式输出
-- [ ] 第二家厂商（DeepSeek，兼容 OpenAI 格式），验证抽象是否成立
+- [~] 第二家厂商：**跳过 DeepSeek**（要单独充值，且有涨价公告）。改为阶段 6 用 Ollama 做——同样是 OpenAI 兼容格式，对抽象层的检验效果一样，且免费
 - [ ] 超时、重试（指数退避）、Token 用量与耗时日志
 
 ### 本阶段已讲过的概念

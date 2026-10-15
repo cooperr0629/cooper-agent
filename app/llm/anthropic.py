@@ -1,3 +1,4 @@
+import json
 from collections.abc import AsyncIterator
 from typing import Any
 
@@ -53,7 +54,7 @@ class AnthropicClient:
             raw=data,
         )
 
-    def stream(
+    async def stream(
         self,
         messages: list[dict[str, str]],
         *,
@@ -61,7 +62,23 @@ class AnthropicClient:
         max_tokens: int = 1024,
         **kwargs: Any,
     ) -> AsyncIterator[str]:
-        raise NotImplementedError
+        payload: dict[str, Any] = {
+            "model": self._model,
+            "max_tokens": max_tokens,
+            "messages": messages,
+            "stream": True,
+        }
+        if system is not None:
+            payload["system"] = system
+        payload.update(kwargs)
+        async with self._client.stream("POST", API_URL, json=payload) as resp:
+            resp.raise_for_status()
+            async for line in resp.aiter_lines():
+                if not line.startswith("data: "):
+                    continue
+                event = json.loads(line[6:])
+                if event["type"] == "content_block_delta":
+                    yield event["delta"]["text"]
 
     async def aclose(self) -> None:
         await self._client.aclose()
