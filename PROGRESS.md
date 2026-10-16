@@ -4,7 +4,7 @@
 
 ## 当前状态
 
-- **当前阶段**：阶段 1（LLM 接入层）
+- **当前阶段**：阶段 2（对话与提示词）
 - **开始日期**：2026-10-12
 - **项目状态**：FastAPI 服务可运行，`GET /health` 返回 `{"status":"ok","env":"local"}`
 
@@ -32,17 +32,25 @@
 
 - `/health` 每个请求都新建一条数据库连接。等阶段 2 真正读写 PostgreSQL 时换成连接池，到时候能直观看出差别。
 
-## 阶段 1（LLM 接入层）进行中
+## 阶段 1（LLM 接入层）已完成
 
 - [x] 不用 SDK，httpx 直发原始请求：`scripts/raw_call.py`，看清了 content 块数组、usage、stop_reason
 - [x] `LLMClient` 接口（Protocol）+ `Usage` / `ChatResponse` 数据类：`app/llm/base.py`
 - [x] `AnthropicClient.chat()`：`app/llm/anthropic.py`，真实调用通过
 - [x] 模型可配置：`.env` 的 `ANTHROPIC_MODEL`，默认 `claude-haiku-5-5`（比 Opus 便宜 40 倍）
-- [ ] `AnthropicClient.stream()`：SSE 流式输出
+- [x] `AnthropicClient.stream()`：SSE 流式输出，首字延迟 1.0s vs 非流式 1.6s
 - [~] 第二家厂商：**跳过 DeepSeek**（要单独充值，且有涨价公告）。改为阶段 6 用 Ollama 做——同样是 OpenAI 兼容格式，对抽象层的检验效果一样，且免费
-- [ ] 超时、重试（指数退避）、Token 用量与耗时日志
+- [x] 超时、重试（指数退避 + 抖动）、Token 用量与耗时日志。实测：404 立刻失败不重试，503 重试 3 次间隔 1.8/2.7/4.8s
 
-### 本阶段已讲过的概念
+### 阶段 2 待办
+
+- [ ] 建表：`conversations` / `messages`
+- [ ] asyncpg 连接池（还掉 /health 那笔技术债）
+- [ ] `/chat` 接口接上 LLMClient，多轮对话能记住上下文
+- [ ] 上下文过长：截断 + 摘要两种策略，对比代价
+- [ ] 结构化输出：让模型稳定返回 JSON，用 Pydantic 校验，失败有重试或兜底
+
+### 已讲过的概念
 
 async/await 的使用时机、异步生成器与 `async for`、Protocol 结构化类型、dataclass、
 keyword-only 参数（`*`）、适配器模式、单下划线命名约定、import 路径规则
