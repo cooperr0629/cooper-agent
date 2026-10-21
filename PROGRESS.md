@@ -28,10 +28,6 @@
 
 - **2026-10-12｜密钥误提交后还安不安全？** 没答出来。要点：commit 是不可变快照，`clone` 默认拉全部历史，所以删文件 + 补 `.gitignore` 对历史无效，`git show <旧commit>:.env` 照样能读出来。唯一可靠处置是**立刻吊销并轮换密钥**；改写历史（filter-repo / BFG）是补充，不是解法。阶段 8 讲安全时再复盘一次。
 
-## 技术债（知道但先不修）
-
-- `/health` 每个请求都新建一条数据库连接。等阶段 2 真正读写 PostgreSQL 时换成连接池，到时候能直观看出差别。
-
 ## 阶段 1（LLM 接入层）已完成
 
 - [x] 不用 SDK，httpx 直发原始请求：`scripts/raw_call.py`，看清了 content 块数组、usage、stop_reason
@@ -44,8 +40,8 @@
 
 ### 阶段 2 待办
 
-- [ ] 建表：`conversations` / `messages`
-- [ ] asyncpg 连接池（还掉 /health 那笔技术债）
+- [x] 建表：`conversations` / `messages`（`migrations/001_init.sql`）
+- [x] asyncpg 连接池 + FastAPI lifespan（技术债已还）。实测 30 并发只占 10 条连接，耗时 0.04s
 - [ ] `/chat` 接口接上 LLMClient，多轮对话能记住上下文
 - [ ] 上下文过长：截断 + 摘要两种策略，对比代价
 - [ ] 结构化输出：让模型稳定返回 JSON，用 Pydantic 校验，失败有重试或兜底
