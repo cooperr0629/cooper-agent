@@ -5,7 +5,6 @@ from app.core.db import get_pool
 
 router = APIRouter()
 
-
 @router.get("/health")
 async def health() -> dict:
     settings = get_settings()
