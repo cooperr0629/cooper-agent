@@ -23,6 +23,10 @@ class Settings(BaseSettings):
     anthropic_model: str = "claude-haiku-5-5"
     deepseek_api_key: str | None = None
 
+    # 上下文过长时的策略："truncate"（丢掉最早的）或 "summarize"（压成摘要）
+    context_strategy: str = "truncate"
+    context_token_budget: int = 2000
+
 
 @lru_cache
 def get_settings() -> Settings:

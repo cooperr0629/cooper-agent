@@ -4,7 +4,7 @@
 
 ## 当前状态
 
-- **当前阶段**：阶段 2（对话与提示词）
+- **当前阶段**：阶段 3（RAG）
 - **开始日期**：2026-10-12
 - **项目状态**：FastAPI 服务可运行，`GET /health` 返回 `{"status":"ok","env":"local"}`
 
@@ -38,13 +38,18 @@
 - [~] 第二家厂商：**跳过 DeepSeek**（要单独充值，且有涨价公告）。改为阶段 6 用 Ollama 做——同样是 OpenAI 兼容格式，对抽象层的检验效果一样，且免费
 - [x] 超时、重试（指数退避 + 抖动）、Token 用量与耗时日志。实测：404 立刻失败不重试，503 重试 3 次间隔 1.8/2.7/4.8s
 
-### 阶段 2 待办
+### 阶段 2 已完成
 
 - [x] 建表：`conversations` / `messages`（`migrations/001_init.sql`）
 - [x] asyncpg 连接池 + FastAPI lifespan（技术债已还）。实测 30 并发只占 10 条连接，耗时 0.04s
-- [ ] `/chat` 接口接上 LLMClient，多轮对话能记住上下文
-- [ ] 上下文过长：截断 + 摘要两种策略，对比代价
-- [ ] 结构化输出：让模型稳定返回 JSON，用 Pydantic 校验，失败有重试或兜底
+- [x] `/chat` 接口接上 LLMClient，多轮对话能记住上下文（实测第二轮答出第一轮说的名字）
+- [x] 上下文过长：`app/llm/context.py` 的 truncate / summarize，可配置。对比见 `scripts/compare_context.py`
+- [x] 结构化输出：`app/llm/structured.py`，schema 进 system + 校验失败回喂错误 + fallback。用于自动生成对话标题
+
+### 下一步：阶段 3（RAG）
+
+Cooper 希望尽快做到 RAPTOR。路径：文档解析切分 → embedding + pgvector → 朴素检索跑通
+→ 阶段 4 建评估 → 然后把 RAPTOR 当成有对照的实验（否则无法判断它值不值）。
 
 ### 已讲过的概念
 
