@@ -27,6 +27,10 @@ class Settings(BaseSettings):
     context_strategy: str = "truncate"
     context_token_budget: int = 2000
 
+    # 本机 Ollama，用于 embedding
+    ollama_base_url: str = "http://localhost:11434"
+    embedding_model: str = "bge-m3"
+
 
 @lru_cache
 def get_settings() -> Settings:

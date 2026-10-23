@@ -46,10 +46,20 @@
 - [x] 上下文过长：`app/llm/context.py` 的 truncate / summarize，可配置。对比见 `scripts/compare_context.py`
 - [x] 结构化输出：`app/llm/structured.py`，schema 进 system + 校验失败回喂错误 + fallback。用于自动生成对话标题
 
-### 下一步：阶段 3（RAG）
+### 阶段 3（RAG）进行中
 
-Cooper 希望尽快做到 RAPTOR。路径：文档解析切分 → embedding + pgvector → 朴素检索跑通
-→ 阶段 4 建评估 → 然后把 RAPTOR 当成有对照的实验（否则无法判断它值不值）。
+- [x] ① 文档解析：`app/rag/loader.py`（Markdown / txt / PDF）
+- [x] ② 两种切分：`app/rag/chunking.py`（固定长度+重叠 / 按标题，标题路径拼进正文）
+- [x] ③ Embedding + 入库：本机 Ollama 跑 bge-m3（1024 维），`migrations/002_rag.sql`，
+      `app/repositories/documents.py` 的 `ingest()`
+- [x] ④ NumPy 手写暴力检索：`app/rag/retrieval.py`，结果与 pgvector `<=>` 完全一致
+- [ ] ⑤ HNSW 索引对比（**需要先灌几万条数据，21 个 chunk 看不出差别**）
+- [ ] ⑥ BM25 关键词检索 → 混合检索
+- [ ] ⑦ Rerank
+- [ ] ⑧ 回答标注引用来源
+- [ ] 然后：阶段 4 评估 → RAPTOR
+
+**环境**：Ollama 已装并常驻，模型 bge-m3（embedding）+ llama3.1 / qwen2.5 / llama3.2（对话，阶段 6 用）
 
 ### 已讲过的概念
 
