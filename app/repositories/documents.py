@@ -39,15 +39,19 @@ async def ingest(
     chunk_size: int = 800,
     embedding_model: str = "bge-m3",
     replace: bool = True,
+    source: str | None = None,
 ) -> UUID:
     """把一个文件灌进库，返回 document_id。
 
     replace=True：同名文件先删后插（CASCADE 会连带删掉旧 chunk）。
     这个默认值是为了你反复调切分参数重导——否则库里会堆一堆重复内容，
     检索时同一段话出现好几次。
+
+    source：存进库里的文档名，默认是文件名。批量导入目录时传相对路径——
+    不同目录下常有同名文件（index.rst），只用文件名会被 replace 互相覆盖。
     """
     path = Path(path)
-    filename = path.name
+    filename = source or path.name
 
     # 前三步不需要数据库连接，别占着连接干几秒钟的活（向量化是最慢的一环）
     text = load(path)

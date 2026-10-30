@@ -26,6 +26,10 @@
 
 ## 没掌握 / 答错过的问题
 
+- **2026-10-30｜HNSW 的 m 调大有什么影响？** 结论答对了，但原因说成"高速公路变多"。纠正：m 是每个节点的邻居上限（路口有几条岔路），不是上层节点变多。同一个 ef_search 下 m 大更慢，但要在同一 recall 下比较。
+- **2026-10-30｜ef_search=5 但 LIMIT 10 会怎样？** 跳过了，做完 ⑤ 的实验后再答。
+- **2026-10-30｜待答**：rst 的 `levels` 改成全局字典有什么影响？查询换 nomic-embed-text、库不动会出什么问题？
+
 - **2026-10-12｜密钥误提交后还安不安全？** 没答出来。要点：commit 是不可变快照，`clone` 默认拉全部历史，所以删文件 + 补 `.gitignore` 对历史无效，`git show <旧commit>:.env` 照样能读出来。唯一可靠处置是**立刻吊销并轮换密钥**；改写历史（filter-repo / BFG）是补充，不是解法。阶段 8 讲安全时再复盘一次。
 
 ## 阶段 1（LLM 接入层）已完成
@@ -53,7 +57,10 @@
 - [x] ③ Embedding + 入库：本机 Ollama 跑 bge-m3（1024 维），`migrations/002_rag.sql`，
       `app/repositories/documents.py` 的 `ingest()`
 - [x] ④ NumPy 手写暴力检索：`app/rag/retrieval.py`，结果与 pgvector `<=>` 完全一致
-- [ ] ⑤ HNSW 索引对比（**需要先灌几万条数据，21 个 chunk 看不出差别**）
+- [ ] ⑤ HNSW 索引对比。语料：CPython 3.13 文档（`data/cpython-src/Doc`，517 个 .rst，12MB，已 gitignore）
+      - [x] loader 支持 .rst（标题转成 Markdown `#`，复用 chunk_by_heading）
+      - [x] 批量入库：`scripts/ingest_corpus.py`，19049 个 chunk，14 分钟（已删 10-23 的 5 万条随机向量）
+      - [ ] `scripts/bench_hnsw.py`：暴力检索当标准答案 → 建 HNSW → 对比延迟 / Recall@10 / 调 m 和 ef_search ← **当前**
 - [ ] ⑥ BM25 关键词检索 → 混合检索
 - [ ] ⑦ Rerank
 - [ ] ⑧ 回答标注引用来源
